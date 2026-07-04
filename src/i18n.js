@@ -80,6 +80,8 @@ export const I18N = {
         confirm_hide_book: 'Hide lorebook "${name}"? It disappears from SillyTavern\'s selectors but the file stays untouched. You can unhide it here anytime.',
         hide_bound_note: 'This book is currently used: ${bindings}. Hiding does not unbind it.',
         hide_also_deactivate: 'Also deactivate globally',
+        hide_dont_ask: 'Don\'t show this confirmation again',
+        opt_confirm_hide: 'Confirm before hiding a book',
         toast_hidden: 'Book hidden',
         toast_unhidden: 'Book is visible again',
 
@@ -230,6 +232,8 @@ export const I18N = {
         confirm_hide_book: 'Скрыть лорбук «${name}»? Он исчезнет из селекторов SillyTavern, но файл останется нетронутым. Вернуть его можно здесь в любой момент.',
         hide_bound_note: 'Книга сейчас используется: ${bindings}. Скрытие не отвязывает её.',
         hide_also_deactivate: 'Также деактивировать глобально',
+        hide_dont_ask: 'Больше не показывать это подтверждение',
+        opt_confirm_hide: 'Подтверждать скрытие книги',
         toast_hidden: 'Книга скрыта',
         toast_unhidden: 'Книга снова видима',
 

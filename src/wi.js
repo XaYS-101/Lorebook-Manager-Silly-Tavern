@@ -34,16 +34,25 @@ export function globalActiveBooks() {
 }
 
 export async function setGlobalActive(name, on) {
-    if (typeof WI.onWorldInfoChange === 'function') {
-        await WI.onWorldInfoChange({ state: on ? 'on' : 'off', silent: true }, name);
-        return;
-    }
-    // Fallback: drive the #world_info multiselect directly.
+    // Drive the #world_info multiselect the same way a user click would:
+    // set the option and fire 'change' so ST's own handler rebuilds
+    // selected_world_info. We deliberately do NOT call onWorldInfoChange
+    // directly — its slash path expects string args (isTrueBoolean crashes on
+    // booleans) and resolves books via their <option>, which a hidden book
+    // doesn't have.
     const idx = bookIndex(name);
     if (idx === -1) return;
     const sel = document.getElementById('world_info');
-    const opt = sel?.querySelector(`option[value="${idx}"]`);
-    if (!opt) return;
+    if (!sel) return;
+    let opt = sel.querySelector(`option[value="${idx}"]`);
+    if (!opt) {
+        if (!on) return; // no option and turning off => already inactive
+        // Hidden book: restore its option (kept in world_names order) so ST's
+        // change handler can pick it up. Once selected, our filter keeps it.
+        opt = new Option(name, String(idx));
+        const after = [...sel.options].find(o => Number(o.value) > idx);
+        sel.insertBefore(opt, after ?? null);
+    }
     opt.selected = on;
     globalThis.jQuery?.(sel).trigger('change');
 }

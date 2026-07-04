@@ -327,9 +327,14 @@ function closeMenus(root) {
 function openActionMenu(anchor, name, isHiddenRow, nav) {
     const root = nav.root;
     if (!root) return;
+    // Second tap on the same ⋮ toggles the menu closed instead of reopening it.
+    const existing = root.querySelector('.lbm-menu');
+    const wasFor = existing?.dataset.for;
     closeMenus(root);
+    if (wasFor === name) return;
     const menu = document.createElement('div');
     menu.className = 'lbm-menu';
+    menu.dataset.for = name;
     const items = [
         ['fa-list', t('act_open_manager'), () => nav.openBook(name)],
         ['fa-up-right-from-square', t('act_open_editor'), () => wi.openEditor(name)],
@@ -347,7 +352,7 @@ function openActionMenu(anchor, name, isHiddenRow, nav) {
         item.className = 'lbm-menu-item' + (extra ? ` ${extra}` : '');
         item.innerHTML = `<i class="fa-solid ${icon}"></i><span>${escapeHtml(label)}</span>`;
         item.addEventListener('click', () => {
-            menu.remove();
+            close();
             Promise.resolve(action()).catch(err => {
                 console.error(LOG, 'action failed', err);
                 toast()?.error(t('toast_error'));
@@ -363,14 +368,24 @@ function openActionMenu(anchor, name, isHiddenRow, nav) {
     const left = Math.max(8, Math.min(a.right - rootRect.left - menu.offsetWidth, rootRect.width - menu.offsetWidth - 8));
     menu.style.top = `${Math.max(8, top)}px`;
     menu.style.left = `${left}px`;
+    // Close on outside tap AND on any list scroll (on phones the list keeps
+    // scrolling under an open menu, inviting misclicks).
+    const scrollHost = root.querySelector('.lbm-body');
+    const close = () => {
+        menu.remove();
+        document.removeEventListener('click', closer, true);
+        scrollHost?.removeEventListener('scroll', close);
+    };
+    const closer = (e) => {
+        if (menu.contains(e.target)) return;
+        // Taps on any ⋮ button are handled by openActionMenu itself (toggle /
+        // switch to another book) — closing here would break the toggle.
+        if (e.target instanceof Element && e.target.closest('.lbm-menu-btn')) return;
+        close();
+    };
     setTimeout(() => {
-        const closer = (e) => {
-            if (!menu.contains(e.target)) {
-                menu.remove();
-                document.removeEventListener('click', closer, true);
-            }
-        };
         document.addEventListener('click', closer, true);
+        scrollHost?.addEventListener('scroll', close, { passive: true });
     }, 0);
 }
 
@@ -432,24 +447,32 @@ async function deleteFlow(name, nav) {
 }
 
 async function hideFlow(name, nav) {
-    const b = bindings.getBindings(name);
-    const wrap = document.createElement('div');
-    wrap.className = 'lbm-dialog-content';
-    const usedParts = [];
-    if (b.global) usedParts.push(t('badge_global'));
-    if (b.chat) usedParts.push(t('badge_chat'));
-    if (b.primaryChars.length) usedParts.push(t('badge_primary', { chars: b.primaryChars.join(', ') }));
-    if (b.auxChars.length) usedParts.push(t('badge_aux', { chars: b.auxChars.join(', ') }));
-    if (b.persona) usedParts.push(t('badge_persona'));
-    wrap.innerHTML = `
-        <p>${escapeHtml(t('confirm_hide_book', { name }))}</p>
-        ${usedParts.length ? `<p class="lbm-warn-text">${escapeHtml(t('hide_bound_note', { bindings: usedParts.join('; ') }))}</p>` : ''}
-        ${b.global ? `<label class="checkbox_label"><input type="checkbox" class="lbm-deact"><span>${escapeHtml(t('hide_also_deactivate'))}</span></label>` : ''}
-    `;
-    const ok = await callGenericPopup(wrap, POPUP_TYPE.CONFIRM ?? 2);
-    if (ok !== (POPUP_RESULT?.AFFIRMATIVE ?? 1)) return;
-    if (b.global && wrap.querySelector('.lbm-deact')?.checked) {
-        await wi.setGlobalActive(name, false);
+    const s = getSettings();
+    if (s.confirmHide) {
+        const b = bindings.getBindings(name);
+        const wrap = document.createElement('div');
+        wrap.className = 'lbm-dialog-content';
+        const usedParts = [];
+        if (b.global) usedParts.push(t('badge_global'));
+        if (b.chat) usedParts.push(t('badge_chat'));
+        if (b.primaryChars.length) usedParts.push(t('badge_primary', { chars: b.primaryChars.join(', ') }));
+        if (b.auxChars.length) usedParts.push(t('badge_aux', { chars: b.auxChars.join(', ') }));
+        if (b.persona) usedParts.push(t('badge_persona'));
+        wrap.innerHTML = `
+            <p>${escapeHtml(t('confirm_hide_book', { name }))}</p>
+            ${usedParts.length ? `<p class="lbm-warn-text">${escapeHtml(t('hide_bound_note', { bindings: usedParts.join('; ') }))}</p>` : ''}
+            ${b.global ? `<label class="checkbox_label"><input type="checkbox" class="lbm-deact"><span>${escapeHtml(t('hide_also_deactivate'))}</span></label>` : ''}
+            <label class="checkbox_label lbm-muted"><input type="checkbox" class="lbm-noask"><span>${escapeHtml(t('hide_dont_ask'))}</span></label>
+        `;
+        const ok = await callGenericPopup(wrap, POPUP_TYPE.CONFIRM ?? 2);
+        if (ok !== (POPUP_RESULT?.AFFIRMATIVE ?? 1)) return;
+        if (b.global && wrap.querySelector('.lbm-deact')?.checked) {
+            await wi.setGlobalActive(name, false);
+        }
+        if (wrap.querySelector('.lbm-noask')?.checked) {
+            s.confirmHide = false;
+            save();
+        }
     }
     hide.hideBook(name);
     toast()?.success(t('toast_hidden'));

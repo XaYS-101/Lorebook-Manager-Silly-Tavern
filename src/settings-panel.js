@@ -42,6 +42,10 @@ const PANEL_HTML = `
                 <input id="lbm_opt_confirm_bulk" type="checkbox">
                 <span data-lbm-i18n="opt_confirm_bulk"></span>
             </label>
+            <label class="checkbox_label">
+                <input id="lbm_opt_confirm_hide" type="checkbox">
+                <span data-lbm-i18n="opt_confirm_hide"></span>
+            </label>
             <hr>
             <div class="lbm-set-block">
                 <label for="lbm_patterns"><b data-lbm-i18n="auto_hide_title"></b></label>
@@ -80,6 +84,7 @@ function syncControls(panel) {
     panel.querySelector('#lbm_language').value = s.language;
     panel.querySelector('#lbm_opt_show_hidden').checked = !!s.showHidden;
     panel.querySelector('#lbm_opt_confirm_bulk').checked = !!s.confirmBulk;
+    panel.querySelector('#lbm_opt_confirm_hide').checked = !!s.confirmHide;
     panel.querySelector('#lbm_patterns').value = getPatterns().join('\n');
     updatePreview(panel);
 }
@@ -168,6 +173,10 @@ export function mountSettingsPanel() {
     });
     panel.querySelector('#lbm_opt_confirm_bulk').addEventListener('change', (e) => {
         getSettings().confirmBulk = !!e.target.checked;
+        save();
+    });
+    panel.querySelector('#lbm_opt_confirm_hide').addEventListener('change', (e) => {
+        getSettings().confirmHide = !!e.target.checked;
         save();
     });
     const patternsBox = panel.querySelector('#lbm_patterns');

@@ -20,6 +20,7 @@ export const DEFAULTS = {
     manualOrder: [],    // book names, manual mode only
     maximized: false,
     confirmBulk: true,
+    confirmHide: true,
     searchHidden: false,
 };
 
