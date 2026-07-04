@@ -581,6 +581,28 @@ dialog.popup.lbm-dialog .popup-content {
     opacity: 0.3;
 }
 
+.lbm-settings .lbm-set-block {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 6px 0;
+}
+
+.lbm-settings .lbm-patterns {
+    width: 100%;
+    resize: vertical;
+    font-family: var(--monoFontFamily, monospace);
+    min-height: 60px;
+}
+
+.lbm-settings .lbm-set-block small.lbm-muted {
+    line-height: 1.35;
+}
+
+.lbm-badge-rule {
+    color: var(--SmartThemeQuoteColor, #7aa2f7);
+}
+
 /* ---------- Mobile ---------- */
 @media (max-width: 600px) {
     /* Always fullscreen on phones */

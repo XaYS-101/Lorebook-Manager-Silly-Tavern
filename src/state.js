@@ -12,7 +12,9 @@ export const DEFAULTS = {
     language: 'ru',
     folders: {},        // id -> { id, name, parentId, color, icon, collapsed, order }
     assign: {},         // bookName -> folderId
-    hidden: [],         // [bookName]
+    hidden: [],         // [bookName] — explicitly hidden
+    hidePatterns: [],   // [mask] — auto-hide any book matching a mask
+    hideExceptions: [], // [bookName] — forced visible despite matching a mask
     showHidden: false,
     sortMode: 'alpha',  // 'alpha' | 'manual'
     manualOrder: [],    // book names, manual mode only
@@ -81,6 +83,7 @@ export function noteBookListRendered(liveNames) {
     const orphans = new Set();
     for (const name of Object.keys(s.assign)) if (!live.has(name)) orphans.add(name);
     for (const name of s.hidden) if (!live.has(name)) orphans.add(name);
+    for (const name of s.hideExceptions) if (!live.has(name)) orphans.add(name);
     for (const name of s.manualOrder) if (!live.has(name)) orphans.add(name);
 
     if (orphans.size === 0) {
@@ -95,6 +98,7 @@ export function noteBookListRendered(liveNames) {
     if (orphanStreak >= 2) {
         for (const name of orphans) delete s.assign[name];
         s.hidden = s.hidden.filter(n => !orphans.has(n));
+        s.hideExceptions = s.hideExceptions.filter(n => !orphans.has(n));
         s.manualOrder = s.manualOrder.filter(n => !orphans.has(n));
         orphanStreak = 0;
         lastOrphans = new Set();
@@ -111,6 +115,8 @@ export function migrateBookName(oldName, newName) {
     }
     const hi = s.hidden.indexOf(oldName);
     if (hi !== -1) s.hidden[hi] = newName;
+    const ei = s.hideExceptions.indexOf(oldName);
+    if (ei !== -1) s.hideExceptions[ei] = newName;
     const mi = s.manualOrder.indexOf(oldName);
     if (mi !== -1) s.manualOrder[mi] = newName;
     save();
@@ -120,6 +126,7 @@ export function forgetBook(name) {
     const s = getSettings();
     delete s.assign[name];
     s.hidden = s.hidden.filter(n => n !== name);
+    s.hideExceptions = s.hideExceptions.filter(n => n !== name);
     s.manualOrder = s.manualOrder.filter(n => n !== name);
     save();
 }

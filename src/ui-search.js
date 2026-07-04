@@ -6,6 +6,7 @@ import { t, localize } from './i18n.js';
 import { escapeHtml, LOG } from './util.js';
 import { getSettings, save } from './state.js';
 import * as wi from './wi.js';
+import * as hide from './hide.js';
 import * as searchMod from './search.js';
 
 let activeSignal = null;
@@ -36,8 +37,8 @@ export async function renderSearchView(toolbar, body, nav, { query }) {
         return;
     }
 
-    const hiddenSet = new Set(s.hidden);
-    const targets = wi.listBooks().filter(n => s.searchHidden || !hiddenSet.has(n));
+    const isBookHidden = (n) => hide.isHidden(n);
+    const targets = wi.listBooks().filter(n => s.searchHidden || !isBookHidden(n));
 
     // Cancel any previous indexing run, start ours
     if (activeSignal) activeSignal.cancelled = true;
@@ -98,7 +99,7 @@ export async function renderSearchView(toolbar, body, nav, { query }) {
         const head = document.createElement('div');
         head.className = 'lbm-search-book';
         head.innerHTML = `
-            <span class="lbm-search-book-name">${escapeHtml(book)}${hiddenSet.has(book) ? ' <i class="fa-solid fa-eye-slash lbm-muted"></i>' : ''}</span>
+            <span class="lbm-search-book-name">${escapeHtml(book)}${isBookHidden(book) ? ' <i class="fa-solid fa-eye-slash lbm-muted"></i>' : ''}</span>
             <span class="lbm-folder-count">${hits.length}</span>
             <div class="lbm-mini-btn fa-solid fa-list" title="${escapeHtml(t('act_open_manager'))}"></div>
         `;

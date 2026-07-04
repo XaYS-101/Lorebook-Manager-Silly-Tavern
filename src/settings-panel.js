@@ -5,7 +5,8 @@ import { callGenericPopup, POPUP_TYPE, POPUP_RESULT } from '../../../../popup.js
 import { t, localize, getLang } from './i18n.js';
 import { escapeHtml, LOG } from './util.js';
 import { MODULE, getSettings, save, resetAllData } from './state.js';
-import { restoreAll, scheduleApply } from './hide.js';
+import { restoreAll, scheduleApply, getPatterns, setPatterns, countMaskMatches } from './hide.js';
+import { listBooks } from './wi.js';
 import { invalidateAll } from './search.js';
 import { openManager } from './ui-popup.js';
 
@@ -42,6 +43,16 @@ const PANEL_HTML = `
                 <span data-lbm-i18n="opt_confirm_bulk"></span>
             </label>
             <hr>
+            <div class="lbm-set-block">
+                <label for="lbm_patterns"><b data-lbm-i18n="auto_hide_title"></b></label>
+                <small class="lbm-muted" data-lbm-i18n="auto_hide_help"></small>
+                <textarea id="lbm_patterns" class="text_pole lbm-patterns" rows="3" data-lbm-i18n="[placeholder]auto_hide_placeholder"></textarea>
+                <div class="lbm-set-row">
+                    <div id="lbm_patterns_apply" class="menu_button"><i class="fa-solid fa-check"></i> <span data-lbm-i18n="auto_hide_apply"></span></div>
+                    <small class="lbm-muted lbm-patterns-preview"></small>
+                </div>
+            </div>
+            <hr>
             <div class="lbm-set-row">
                 <div id="lbm_export" class="menu_button"><i class="fa-solid fa-file-export"></i> <span data-lbm-i18n="export_btn"></span></div>
                 <div id="lbm_import" class="menu_button"><i class="fa-solid fa-file-import"></i> <span data-lbm-i18n="import_btn"></span></div>
@@ -55,11 +66,22 @@ const PANEL_HTML = `
     </div>
 </div>`;
 
+function updatePreview(panel, masksOverride) {
+    const preview = panel.querySelector('.lbm-patterns-preview');
+    if (!preview) return;
+    const n = masksOverride
+        ? countMaskMatches(listBooks(), masksOverride)
+        : countMaskMatches(listBooks());
+    preview.textContent = t('auto_hide_preview', { n });
+}
+
 function syncControls(panel) {
     const s = getSettings();
     panel.querySelector('#lbm_language').value = s.language;
     panel.querySelector('#lbm_opt_show_hidden').checked = !!s.showHidden;
     panel.querySelector('#lbm_opt_confirm_bulk').checked = !!s.confirmBulk;
+    panel.querySelector('#lbm_patterns').value = getPatterns().join('\n');
+    updatePreview(panel);
 }
 
 function exportData() {
@@ -70,6 +92,8 @@ function exportData() {
         folders: s.folders,
         assign: s.assign,
         hidden: s.hidden,
+        hidePatterns: s.hidePatterns,
+        hideExceptions: s.hideExceptions,
         sortMode: s.sortMode,
         manualOrder: s.manualOrder,
     };
@@ -94,11 +118,13 @@ async function importData(event, panel) {
         s.folders = data.folders ?? {};
         s.assign = typeof data.assign === 'object' && data.assign ? data.assign : {};
         s.hidden = Array.isArray(data.hidden) ? data.hidden.map(String) : [];
+        s.hidePatterns = Array.isArray(data.hidePatterns) ? data.hidePatterns.map(String) : [];
+        s.hideExceptions = Array.isArray(data.hideExceptions) ? data.hideExceptions.map(String) : [];
         s.sortMode = data.sortMode === 'manual' ? 'manual' : 'alpha';
         s.manualOrder = Array.isArray(data.manualOrder) ? data.manualOrder.map(String) : [];
         save();
         invalidateAll();
-        scheduleApply();
+        await restoreAll();          // rebuild ST's selects, then re-filter
         syncControls(panel);
         toast()?.success(t('import_ok'));
     } catch (err) {
@@ -144,6 +170,22 @@ export function mountSettingsPanel() {
         getSettings().confirmBulk = !!e.target.checked;
         save();
     });
+    const patternsBox = panel.querySelector('#lbm_patterns');
+    const applyPatterns = async () => {
+        // blur + Apply-click both fire; skip if nothing actually changed.
+        if (patternsBox.value.trim() === getPatterns().join('\n')) return;
+        await setPatterns(patternsBox.value);
+        syncControls(panel);
+        toast()?.success(t('auto_hide_applied'));
+    };
+    // Live preview while typing (against the un-applied text); commit on Apply or blur.
+    patternsBox.addEventListener('input', () => {
+        const masks = patternsBox.value.split('\n').map(l => l.trim()).filter(Boolean);
+        updatePreview(panel, masks);
+    });
+    patternsBox.addEventListener('blur', applyPatterns);
+    panel.querySelector('#lbm_patterns_apply').addEventListener('click', applyPatterns);
+
     panel.querySelector('#lbm_export').addEventListener('click', exportData);
     panel.querySelector('#lbm_import').addEventListener('click', () => panel.querySelector('#lbm_import_file').click());
     panel.querySelector('#lbm_import_file').addEventListener('change', (e) => importData(e, panel));

@@ -67,9 +67,8 @@ export async function renderBooksView(toolbar, body, nav) {
     const s = getSettings();
     const allNames = wi.listBooks();
     noteBookListRendered(allNames);
-    const hiddenSet = new Set(s.hidden);
-    const visible = allNames.filter(n => !hiddenSet.has(n));
-    const hiddenExisting = allNames.filter(n => hiddenSet.has(n));
+    const visible = allNames.filter(n => !hide.isHidden(n));
+    const hiddenExisting = allNames.filter(n => hide.isHidden(n));
 
     // Toolbar
     toolbar.innerHTML = `
@@ -216,11 +215,12 @@ function renderBookRow(name, siblings, nav, isHiddenRow) {
     row.className = 'lbm-book-row' + (isHiddenRow ? ' lbm-row-hidden' : '');
     row.dataset.name = name;
     const active = wi.isGlobalActive(name);
+    const byRule = isHiddenRow && hide.isHiddenByRule(name);
     row.innerHTML = `
         <div class="lbm-dot ${active ? 'lbm-on' : ''}" title="${escapeHtml(t('toggle_global_title'))}"></div>
         <div class="lbm-book-main">
             <span class="lbm-book-name">${escapeHtml(name)}</span>
-            <span class="lbm-badges">${badgesHtml(name)}${isHiddenRow && active ? `<span class="lbm-badge lbm-badge-warn" title="${escapeHtml(t('active_hidden_badge'))}">⚠</span>` : ''}</span>
+            <span class="lbm-badges">${badgesHtml(name)}${isHiddenRow && active ? `<span class="lbm-badge lbm-badge-warn" title="${escapeHtml(t('active_hidden_badge'))}">⚠</span>` : ''}${byRule ? `<span class="lbm-badge lbm-badge-rule" title="${escapeHtml(t('hidden_by_rule'))}">✳</span>` : ''}</span>
         </div>
         <span class="lbm-count" title="${escapeHtml(t('entries_short'))}">${escapeHtml(countText(name))}</span>
         <div class="lbm-row-actions">

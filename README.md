@@ -33,6 +33,8 @@ The `⋮` menu on any book has **Hide**. A hidden book:
 
 If the book is currently used somewhere, the hide dialog lists its bindings and offers to also deactivate it globally.
 
+**Auto-hide by name.** In the extension settings you can enter one or more **masks** (one per line) to hide matching books automatically — including books you create later. `*` and `?` are wildcards (`chat_*` hides everything starting with `chat_`); a plain word matches any name that contains it, case-insensitively (`diary` hides "Alice's diary"). A live counter shows how many books currently match. This is ideal for the "one lorebook per chat" workflow: mask the chat books once and only your shared/global books stay in view. Manually clicking **Show** on a masked book keeps it visible as an exception — manual choice always wins over a mask.
+
 ### 3. Folders
 Collapsible folders with a colour stripe and an emoji icon, nestable via the parent picker (with cycle protection). File books by drag-and-drop on desktop or through the "Move to folder…" picker anywhere. Folder counters show the real number of books including subfolders. Sorting: alphabetical or manual (with per-row up/down arrows).
 
