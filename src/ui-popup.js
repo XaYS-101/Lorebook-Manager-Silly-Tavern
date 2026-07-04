@@ -9,7 +9,7 @@ import { t, localize } from './i18n.js';
 import { getSettings, save } from './state.js';
 import { debounce, LOG } from './util.js';
 import { isInternalWrite } from './wi.js';
-import { renderBooksView } from './ui-books.js';
+import { renderBooksView, resetBooksSelection } from './ui-books.js';
 import { renderBookView } from './ui-book.js';
 import { renderSearchView } from './ui-search.js';
 
@@ -91,6 +91,7 @@ function applyMaximized(dlg) {
 
 export async function openManager(initialView = 'books', initialParams = {}) {
     if (current) return;
+    resetBooksSelection();
     const root = buildRoot();
     const toolbar = root.querySelector('.lbm-toolbar');
     const body = root.querySelector('.lbm-body');

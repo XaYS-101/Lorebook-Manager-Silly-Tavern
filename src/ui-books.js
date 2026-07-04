@@ -63,6 +63,17 @@ function ensureManualSeed() {
 let dragName = null;
 let countsGeneration = 0;
 
+// Multi-select mode (bulk hide / show / move). Persists across the automatic
+// rerenders while the manager stays on the books view; cleared on exit.
+let selMode = false;
+const selBooks = new Set();
+
+/** Called when the manager opens so a stale select mode never lingers. */
+export function resetBooksSelection() {
+    selMode = false;
+    selBooks.clear();
+}
+
 export async function renderBooksView(toolbar, body, nav) {
     const s = getSettings();
     const allNames = wi.listBooks();
@@ -83,11 +94,17 @@ export async function renderBooksView(toolbar, body, nav) {
             <span data-lbm-i18n="show_hidden"></span>
         </label>
         <div class="menu_button lbm-tb-btn lbm-collapse-all fa-solid fa-compress" data-lbm-i18n="[title]collapse_all"></div>
+        <div class="menu_button lbm-tb-btn lbm-sel-toggle ${selMode ? 'lbm-active' : ''}"><i class="fa-solid fa-list-check"></i><span>${escapeHtml(selMode ? t('sel_exit') : t('sel_mode'))}</span></div>
         <div class="lbm-tb-count" data-count></div>
     `;
     localize(toolbar);
     toolbar.querySelector('[data-count]').textContent = t('books_count', { n: allNames.length });
     toolbar.querySelector('.lbm-sort').value = s.sortMode;
+    toolbar.querySelector('.lbm-sel-toggle').addEventListener('click', () => {
+        selMode = !selMode;
+        selBooks.clear();
+        nav.rerender();
+    });
 
     toolbar.querySelector('.lbm-new-book').addEventListener('click', () => createBookFlow(nav));
     toolbar.querySelector('.lbm-new-folder').addEventListener('click', () => folderDialog(null, nav));
@@ -145,7 +162,27 @@ export async function renderBooksView(toolbar, body, nav) {
     }
     body.appendChild(frag);
 
+    nav.root?.classList.toggle('lbm-selecting', selMode);
+    if (selMode) body.appendChild(buildBulkBar(nav));
+
     loadCountsInBackground(visible.concat(hiddenExisting), body);
+}
+
+function buildBulkBar(nav) {
+    const bar = document.createElement('div');
+    bar.className = 'lbm-bulk-bar lbm-books-bulk';
+    bar.innerHTML = `
+        <span class="lbm-bulk-count"></span>
+        <div class="menu_button lbm-tb-btn lbm-bulk-hide"><i class="fa-solid fa-eye-slash"></i><span data-lbm-i18n="act_hide"></span></div>
+        <div class="menu_button lbm-tb-btn lbm-bulk-unhide"><i class="fa-solid fa-eye"></i><span data-lbm-i18n="act_unhide"></span></div>
+        <div class="menu_button lbm-tb-btn lbm-bulk-move"><i class="fa-solid fa-folder-open"></i><span data-lbm-i18n="act_move"></span></div>
+    `;
+    localize(bar);
+    bar.querySelector('.lbm-bulk-count').textContent = t('selected_n', { n: selBooks.size });
+    bar.querySelector('.lbm-bulk-hide').addEventListener('click', () => bulkHideFlow(nav));
+    bar.querySelector('.lbm-bulk-unhide').addEventListener('click', () => bulkUnhideFlow(nav));
+    bar.querySelector('.lbm-bulk-move').addEventListener('click', () => bulkMoveFlow(nav));
+    return bar;
 }
 
 function renderFolder(folder, visible, nav, depth) {
@@ -212,11 +249,12 @@ function countText(name) {
 function renderBookRow(name, siblings, nav, isHiddenRow) {
     const s = getSettings();
     const row = document.createElement('div');
-    row.className = 'lbm-book-row' + (isHiddenRow ? ' lbm-row-hidden' : '');
+    row.className = 'lbm-book-row' + (isHiddenRow ? ' lbm-row-hidden' : '') + (selMode && selBooks.has(name) ? ' lbm-selected' : '');
     row.dataset.name = name;
     const active = wi.isGlobalActive(name);
     const byRule = isHiddenRow && hide.isHiddenByRule(name);
     row.innerHTML = `
+        ${selMode ? `<input type="checkbox" class="lbm-book-check" ${selBooks.has(name) ? 'checked' : ''}>` : ''}
         <div class="lbm-dot ${active ? 'lbm-on' : ''}" title="${escapeHtml(t('toggle_global_title'))}"></div>
         <div class="lbm-book-main">
             <span class="lbm-book-name">${escapeHtml(name)}</span>
@@ -240,7 +278,23 @@ function renderBookRow(name, siblings, nav, isHiddenRow) {
             toast()?.error(t('toast_error'));
         }
     });
-    row.querySelector('.lbm-book-main').addEventListener('click', () => nav.openBook(name));
+    const toggleSel = () => {
+        if (selBooks.has(name)) selBooks.delete(name);
+        else selBooks.add(name);
+        row.classList.toggle('lbm-selected', selBooks.has(name));
+        const box = row.querySelector('.lbm-book-check');
+        if (box) box.checked = selBooks.has(name);
+        const count = nav.root?.querySelector('.lbm-bulk-count');
+        if (count) count.textContent = t('selected_n', { n: selBooks.size });
+    };
+    row.querySelector('.lbm-book-main').addEventListener('click', () => {
+        if (selMode) toggleSel();
+        else nav.openBook(name);
+    });
+    row.querySelector('.lbm-book-check')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleSel();
+    });
     row.querySelector('.lbm-menu-btn').addEventListener('click', (e) => {
         e.stopPropagation();
         openActionMenu(e.currentTarget, name, isHiddenRow, nav);
@@ -251,7 +305,7 @@ function renderBookRow(name, siblings, nav, isHiddenRow) {
             moveManual(name, siblings, Number(btn.dataset.move), nav);
         });
     }
-    if (!isHiddenRow) {
+    if (!isHiddenRow && !selMode) {
         row.draggable = true;
         row.addEventListener('dragstart', (e) => {
             dragName = name;
@@ -482,6 +536,70 @@ async function hideFlow(name, nav) {
 async function unhideFlow(name, nav) {
     await hide.unhideBook(name);
     toast()?.success(t('toast_unhidden'));
+    nav.rerender();
+}
+
+// --- Bulk (select mode) ------------------------------------------------------
+
+async function bulkHideFlow(nav) {
+    const names = [...selBooks].filter(n => !hide.isHidden(n));
+    if (names.length === 0) return;
+    const s = getSettings();
+    const active = names.filter(n => wi.isGlobalActive(n));
+    if (s.confirmHide) {
+        const wrap = document.createElement('div');
+        wrap.className = 'lbm-dialog-content';
+        wrap.innerHTML = `
+            <p>${escapeHtml(t('confirm_hide_bulk', { n: names.length }))}</p>
+            ${active.length ? `<label class="checkbox_label"><input type="checkbox" class="lbm-deact"><span>${escapeHtml(t('hide_also_deactivate_n', { n: active.length }))}</span></label>` : ''}
+            <label class="checkbox_label lbm-muted"><input type="checkbox" class="lbm-noask"><span>${escapeHtml(t('hide_dont_ask'))}</span></label>
+        `;
+        const ok = await callGenericPopup(wrap, POPUP_TYPE.CONFIRM ?? 2);
+        if (ok !== (POPUP_RESULT?.AFFIRMATIVE ?? 1)) return;
+        if (active.length && wrap.querySelector('.lbm-deact')?.checked) {
+            for (const n of active) await wi.setGlobalActive(n, false);
+        }
+        if (wrap.querySelector('.lbm-noask')?.checked) {
+            s.confirmHide = false;
+            save();
+        }
+    }
+    hide.hideBooks(names);
+    selBooks.clear();
+    toast()?.success(t('toast_hidden_n', { n: names.length }));
+    nav.rerender();
+}
+
+async function bulkUnhideFlow(nav) {
+    const names = [...selBooks].filter(n => hide.isHidden(n));
+    if (names.length === 0) return;
+    await hide.unhideBooks(names);
+    selBooks.clear();
+    toast()?.success(t('toast_unhidden_n', { n: names.length }));
+    nav.rerender();
+}
+
+async function bulkMoveFlow(nav) {
+    const names = [...selBooks];
+    if (names.length === 0) return;
+    const wrap = document.createElement('div');
+    wrap.className = 'lbm-dialog-content';
+    wrap.innerHTML = `
+        <h4>${escapeHtml(t('move_title'))} (${names.length})</h4>
+        <select class="text_pole lbm-move-target">
+            ${buildFolderOptionTree('', null, t('move_none'))}
+        </select>
+    `;
+    const ok = await callGenericPopup(wrap, POPUP_TYPE.CONFIRM ?? 2, '', { okButton: t('apply'), cancelButton: t('cancel') });
+    if (ok !== (POPUP_RESULT?.AFFIRMATIVE ?? 1)) return;
+    const folderId = wrap.querySelector('.lbm-move-target').value || null;
+    const s = getSettings();
+    for (const name of names) {
+        if (folderId) s.assign[name] = folderId;
+        else delete s.assign[name];
+    }
+    save();
+    selBooks.clear();
     nav.rerender();
 }
 

@@ -86,20 +86,34 @@ export function countMaskMatches(names, masks) {
 
 /** Explicitly hide a book. Confirmation/deactivation is the caller's job. */
 export function hideBook(name) {
-    const s = getSettings();
-    s.hideExceptions = s.hideExceptions.filter(n => n !== name);
-    if (!s.hidden.includes(name)) s.hidden.push(name);
-    save();
-    scheduleApply();
+    hideBooks([name]);
 }
 
 /** Show a book again. If it still matches a mask, record an exception so the
  * mask doesn't immediately re-hide it. */
 export async function unhideBook(name) {
+    await unhideBooks([name]);
+}
+
+/** Batch hide: one save + one re-filter for a whole selection. */
+export function hideBooks(names) {
     const s = getSettings();
-    s.hidden = s.hidden.filter(n => n !== name);
-    if (matchesPattern(name) && !s.hideExceptions.includes(name)) {
-        s.hideExceptions.push(name);
+    const set = new Set(names);
+    s.hideExceptions = s.hideExceptions.filter(n => !set.has(n));
+    for (const name of names) if (!s.hidden.includes(name)) s.hidden.push(name);
+    save();
+    scheduleApply();
+}
+
+/** Batch show: mask-matched books get an exception so they stay visible. */
+export async function unhideBooks(names) {
+    const s = getSettings();
+    const set = new Set(names);
+    s.hidden = s.hidden.filter(n => !set.has(n));
+    for (const name of names) {
+        if (matchesPattern(name) && !s.hideExceptions.includes(name)) {
+            s.hideExceptions.push(name);
+        }
     }
     save();
     // updateWorldInfoList() rebuilds the full option sets; our observers then

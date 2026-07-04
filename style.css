@@ -603,20 +603,33 @@ dialog.popup.lbm-dialog .popup-content {
     color: var(--SmartThemeQuoteColor, #7aa2f7);
 }
 
+/* ---------- Book multi-select ---------- */
+.lbm-book-check {
+    flex: 0 0 auto;
+    width: 18px;
+    height: 18px;
+    margin: 0 2px;
+}
+
+.lbm-book-row.lbm-selected {
+    background: rgba(122, 162, 247, 0.18);
+}
+
+.lbm-books-bulk {
+    position: sticky;
+    bottom: 0;
+    margin-top: 8px;
+    z-index: 5;
+    background: var(--SmartThemeBlurTintColor, #202225);
+}
+
 /* ---------- Mobile ---------- */
 @media (max-width: 600px) {
-    /* Always fullscreen on phones */
-    dialog.popup.lbm-dialog {
-        width: 100dvw !important;
-        height: 100dvh !important;
-        max-width: 100dvw !important;
-        max-height: 100dvh !important;
-        border-radius: 0 !important;
-        margin: 0 !important;
-    }
-
+    /* Fullscreen is driven by the maximize button (.lbm-max), same as desktop —
+       so the toggle works on phones too instead of being forced/hidden. */
     .lbm-max-btn {
-        display: none;
+        min-width: 40px;
+        min-height: 40px;
     }
 
     .lbm-title {

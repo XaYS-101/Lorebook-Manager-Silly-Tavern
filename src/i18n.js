@@ -84,6 +84,10 @@ export const I18N = {
         opt_confirm_hide: 'Confirm before hiding a book',
         toast_hidden: 'Book hidden',
         toast_unhidden: 'Book is visible again',
+        confirm_hide_bulk: 'Hide ${n} books? They disappear from SillyTavern\'s selectors but the files stay untouched.',
+        hide_also_deactivate_n: 'Also deactivate ${n} globally active',
+        toast_hidden_n: '${n} books hidden',
+        toast_unhidden_n: '${n} books visible again',
 
         // Book view (entries)
         sel_mode: 'Select',
@@ -236,6 +240,10 @@ export const I18N = {
         opt_confirm_hide: 'Подтверждать скрытие книги',
         toast_hidden: 'Книга скрыта',
         toast_unhidden: 'Книга снова видима',
+        confirm_hide_bulk: 'Скрыть книг: ${n}? Они исчезнут из селекторов SillyTavern, но файлы останутся нетронутыми.',
+        hide_also_deactivate_n: 'Также деактивировать глобально активных: ${n}',
+        toast_hidden_n: 'Скрыто книг: ${n}',
+        toast_unhidden_n: 'Возвращено книг: ${n}',
 
         sel_mode: 'Выбрать',
         sel_exit: 'Готово',
