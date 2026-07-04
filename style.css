@@ -1,0 +1,656 @@
+/* Lorebook Manager */
+
+/* ---------- Dialog sizing ---------- */
+/* The dialog is sized by ST's wide/large flags; content is always width:100%.
+   .lbm-max is the maximize toggle. */
+dialog.popup.lbm-dialog.lbm-max {
+    width: 100dvw !important;
+    height: 100dvh !important;
+    max-width: 100dvw !important;
+    max-height: 100dvh !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+}
+
+/* Make the content area a flex column so .lbm-root can fill the dialog */
+dialog.popup.lbm-dialog .popup-content {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.lbm-root {
+    width: 100%;
+    height: 100%;
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    text-align: left;
+    position: relative;
+}
+
+/* ---------- Header ---------- */
+.lbm-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: nowrap;
+}
+
+.lbm-title {
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.lbm-search {
+    flex: 1 1 auto;
+    min-width: 80px;
+    width: auto;
+}
+
+.lbm-max-btn {
+    flex: 0 0 auto;
+    min-width: 32px;
+    min-height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ---------- Toolbar ---------- */
+.lbm-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.lbm-tb-btn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+    min-height: 32px;
+    width: auto;
+}
+
+.lbm-tb-btn.lbm-active {
+    outline: 1px solid var(--SmartThemeQuoteColor, #7aa2f7);
+}
+
+.lbm-sort {
+    width: auto;
+    min-width: 52px;
+    flex: 0 0 auto;
+}
+
+.lbm-toolbar .checkbox_label {
+    white-space: nowrap;
+}
+
+.lbm-tb-count {
+    margin-left: auto;
+    opacity: 0.7;
+    font-size: 0.9em;
+    white-space: nowrap;
+}
+
+.lbm-book-title {
+    font-weight: bold;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 40%;
+}
+
+/* ---------- Body ---------- */
+.lbm-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 4px;
+}
+
+.lbm-empty {
+    opacity: 0.7;
+    text-align: center;
+    padding: 2em 1em;
+}
+
+/* ---------- Folders ---------- */
+.lbm-folder-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    min-height: 40px;
+    border-left: 3px solid transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.04);
+    margin-top: 4px;
+}
+
+.lbm-folder-head:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.lbm-caret {
+    width: 12px;
+    opacity: 0.7;
+}
+
+.lbm-folder-name {
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.lbm-folder-count {
+    opacity: 0.6;
+    font-size: 0.85em;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    padding: 1px 7px;
+}
+
+.lbm-folder-edit {
+    margin-left: auto;
+    min-width: 32px;
+    min-height: 30px;
+    opacity: 0.6;
+}
+
+.lbm-folder-head:hover .lbm-folder-edit {
+    opacity: 1;
+}
+
+.lbm-folder-body {
+    margin-left: 10px;
+    border-left: 1px solid rgba(255, 255, 255, 0.08);
+    padding-left: 6px;
+}
+
+.lbm-unfiled-head {
+    opacity: 0.75;
+    font-weight: 600;
+    padding: 8px;
+    margin-top: 8px;
+    min-height: 36px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border-radius: 6px;
+}
+
+.lbm-hidden-head {
+    opacity: 0.55;
+}
+
+.lbm-drop-hover {
+    outline: 2px dashed var(--SmartThemeQuoteColor, #7aa2f7);
+    outline-offset: -2px;
+}
+
+/* ---------- Book rows ---------- */
+.lbm-book-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 8px;
+    min-height: 40px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.lbm-book-row:hover {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.lbm-row-hidden {
+    opacity: 0.55;
+}
+
+.lbm-dragging {
+    opacity: 0.4;
+}
+
+.lbm-dot {
+    flex: 0 0 auto;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    cursor: pointer;
+    padding: 6px;
+    background-clip: content-box;
+    box-sizing: content-box;
+}
+
+.lbm-dot.lbm-on {
+    background-color: #58c364;
+    border-color: #58c364;
+}
+
+.lbm-book-main {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    overflow: hidden;
+}
+
+.lbm-book-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.lbm-badges {
+    flex: 0 0 auto;
+    display: flex;
+    gap: 2px;
+    font-size: 0.85em;
+}
+
+.lbm-badge-warn {
+    color: #e0b04a;
+}
+
+.lbm-count {
+    flex: 0 0 auto;
+    opacity: 0.6;
+    font-size: 0.85em;
+    min-width: 44px;
+    text-align: right;
+}
+
+.lbm-row-actions {
+    flex: 0 0 auto;
+    display: flex;
+    gap: 4px;
+}
+
+.lbm-mini-btn {
+    min-width: 36px;
+    min-height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    cursor: pointer;
+    opacity: 0.65;
+}
+
+.lbm-mini-btn:hover {
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* ---------- Action menu ---------- */
+.lbm-menu {
+    position: absolute;
+    z-index: 100;
+    min-width: 220px;
+    background: var(--SmartThemeBlurTintColor, #202225);
+    border: 1px solid var(--SmartThemeBorderColor, rgba(255, 255, 255, 0.2));
+    border-radius: 8px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+    padding: 4px;
+}
+
+.lbm-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    min-height: 40px;
+    border-radius: 6px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.lbm-menu-item i {
+    width: 16px;
+    text-align: center;
+    opacity: 0.8;
+}
+
+.lbm-menu-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+/* ---------- Danger ---------- */
+.lbm-danger {
+    color: var(--fullred, #e04a4a);
+    border-color: var(--fullred, #e04a4a);
+}
+
+.lbm-danger:hover {
+    background: var(--fullred, #e04a4a);
+    color: #fff;
+}
+
+/* ---------- Book view (entries) ---------- */
+.lbm-book-stats {
+    opacity: 0.7;
+    font-size: 0.9em;
+    padding: 2px 8px 8px;
+}
+
+.lbm-entry-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 8px;
+    min-height: 40px;
+    border-radius: 6px;
+}
+
+.lbm-entry-row:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.lbm-entry-off .lbm-entry-title,
+.lbm-entry-off .lbm-entry-keys {
+    opacity: 0.5;
+}
+
+.lbm-entry-check {
+    flex: 0 0 auto;
+    width: 18px;
+    height: 18px;
+}
+
+.lbm-entry-dot {
+    flex: 0 0 auto;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    cursor: pointer;
+    padding: 5px;
+    background-clip: content-box;
+    box-sizing: content-box;
+}
+
+.lbm-entry-dot.lbm-on {
+    background-color: #58c364;
+    border-color: #58c364;
+}
+
+.lbm-entry-dot.lbm-const {
+    background-color: #4a9de0;
+    border-color: #4a9de0;
+}
+
+.lbm-entry-main {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.lbm-entry-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.lbm-entry-keys {
+    font-size: 0.82em;
+    opacity: 0.6;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.lbm-entry-len {
+    flex: 0 0 auto;
+    opacity: 0.5;
+    font-size: 0.8em;
+    min-width: 40px;
+    text-align: right;
+}
+
+.lbm-show-more {
+    margin: 10px auto;
+    width: fit-content;
+    white-space: nowrap;
+}
+
+.lbm-bulk-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding: 8px;
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+}
+
+.lbm-bulk-count {
+    font-weight: 600;
+}
+
+.lbm-hidden-el {
+    display: none !important;
+}
+
+/* ---------- Search view ---------- */
+.lbm-indexing {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.lbm-index-cancel {
+    width: fit-content;
+    white-space: nowrap;
+}
+
+.lbm-search-group {
+    margin-bottom: 10px;
+}
+
+.lbm-search-book {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    min-height: 38px;
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+}
+
+.lbm-search-book-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.lbm-search-book .lbm-mini-btn {
+    margin-left: auto;
+}
+
+.lbm-search-hit {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 8px 4px 16px;
+    min-height: 40px;
+}
+
+.lbm-search-hit:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.lbm-hit-field {
+    font-size: 0.75em;
+    opacity: 0.55;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 6px;
+    padding: 0 5px;
+    margin-left: 6px;
+}
+
+.lbm-hit-snippet {
+    font-size: 0.85em;
+    opacity: 0.75;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.lbm-hit-snippet mark {
+    background: rgba(122, 162, 247, 0.4);
+    color: inherit;
+    border-radius: 2px;
+}
+
+.lbm-muted {
+    opacity: 0.6;
+    font-size: 0.9em;
+}
+
+.lbm-warn-text {
+    color: #e0b04a;
+}
+
+.lbm-disabled {
+    opacity: 0.5;
+}
+
+/* ---------- Dialog content (small popups) ---------- */
+.lbm-dialog-content {
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.lbm-dialog-content label {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.lbm-dialog-content label.checkbox_label {
+    flex-direction: row;
+    align-items: center;
+}
+
+.lbm-dialog-row {
+    display: flex;
+    gap: 12px;
+}
+
+.lbm-dialog-row label {
+    flex: 1 1 0;
+}
+
+/* ---------- Settings drawer ---------- */
+.lbm-settings .lbm-set-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin: 6px 0;
+}
+
+.lbm-settings .menu_button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    min-height: 32px;
+    width: auto;
+}
+
+.lbm-settings hr {
+    opacity: 0.3;
+}
+
+/* ---------- Mobile ---------- */
+@media (max-width: 600px) {
+    /* Always fullscreen on phones */
+    dialog.popup.lbm-dialog {
+        width: 100dvw !important;
+        height: 100dvh !important;
+        max-width: 100dvw !important;
+        max-height: 100dvh !important;
+        border-radius: 0 !important;
+        margin: 0 !important;
+    }
+
+    .lbm-max-btn {
+        display: none;
+    }
+
+    .lbm-title {
+        display: none;
+    }
+
+    .lbm-tb-btn span {
+        display: none; /* icon-only toolbar buttons */
+    }
+
+    .lbm-tb-btn {
+        min-width: 40px;
+        min-height: 40px;
+        justify-content: center;
+    }
+
+    .lbm-tb-count {
+        display: none;
+    }
+
+    .lbm-mini-btn {
+        min-width: 40px;
+        min-height: 40px;
+    }
+
+    .lbm-book-row,
+    .lbm-entry-row,
+    .lbm-menu-item {
+        min-height: 44px;
+    }
+
+    .lbm-entry-len {
+        display: none;
+    }
+
+    .lbm-book-title {
+        max-width: 30%;
+    }
+
+    .lbm-menu {
+        left: 8px !important;
+        right: 8px;
+        min-width: 0;
+    }
+
+    .lbm-bulk-bar .lbm-tb-btn {
+        flex: 1 1 45%;
+        justify-content: center;
+    }
+
+    .lbm-bulk-bar .lbm-tb-btn span {
+        display: inline; /* bulk actions keep labels */
+    }
+
+    .lbm-dialog-row {
+        flex-direction: column;
+        gap: 10px;
+    }
+}

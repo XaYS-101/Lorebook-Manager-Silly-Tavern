@@ -1,0 +1,13 @@
+{
+    "display_name": "Lorebook Manager",
+    "loading_order": 60,
+    "requires": [],
+    "optional": [],
+    "js": "index.js",
+    "css": "style.css",
+    "author": "XaYS-101",
+    "version": "1.0.0",
+    "homePage": "https://github.com/XaYS-101/Lorebook-Manager-Silly-Tavern",
+    "auto_update": true,
+    "minimum_client_version": "1.12.0"
+}
