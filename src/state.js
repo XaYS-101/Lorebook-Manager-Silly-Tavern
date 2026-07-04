@@ -18,7 +18,6 @@ export const DEFAULTS = {
     showHidden: false,
     sortMode: 'alpha',  // 'alpha' | 'manual'
     manualOrder: [],    // book names, manual mode only
-    maximized: false,
     confirmBulk: true,
     confirmHide: true,
     searchHidden: false,

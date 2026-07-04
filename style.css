@@ -1,9 +1,8 @@
 /* Lorebook Manager */
 
 /* ---------- Dialog sizing ---------- */
-/* The dialog is sized by ST's wide/large flags; content is always width:100%.
-   .lbm-max is the maximize toggle. */
-dialog.popup.lbm-dialog.lbm-max {
+/* The manager always opens fullscreen on every viewport; content is width:100%. */
+dialog.popup.lbm-dialog {
     width: 100dvw !important;
     height: 100dvh !important;
     max-width: 100dvw !important;
@@ -48,15 +47,6 @@ dialog.popup.lbm-dialog .popup-content {
     flex: 1 1 auto;
     min-width: 80px;
     width: auto;
-}
-
-.lbm-max-btn {
-    flex: 0 0 auto;
-    min-width: 32px;
-    min-height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
 /* ---------- Toolbar ---------- */
@@ -625,13 +615,6 @@ dialog.popup.lbm-dialog .popup-content {
 
 /* ---------- Mobile ---------- */
 @media (max-width: 600px) {
-    /* Fullscreen is driven by the maximize button (.lbm-max), same as desktop —
-       so the toggle works on phones too instead of being forced/hidden. */
-    .lbm-max-btn {
-        min-width: 40px;
-        min-height: 40px;
-    }
-
     .lbm-title {
         display: none;
     }

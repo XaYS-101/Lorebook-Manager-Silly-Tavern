@@ -1,12 +1,11 @@
-// Manager popup shell: one modal dialog (wide + large) with a maximize
-// toggle, a persistent header search box, a per-view toolbar and a single
-// scrollable body. Views (books / book / search) render into it through the
-// `nav` object so the view modules never import this one.
+// Manager popup shell: one fullscreen modal dialog with a persistent header
+// search box, a per-view toolbar and a single scrollable body. Views
+// (books / book / search) render into it through the `nav` object so the view
+// modules never import this one.
 
 import { eventSource, event_types } from '../../../../../script.js';
 import { Popup, POPUP_TYPE, callGenericPopup } from '../../../../popup.js';
 import { t, localize } from './i18n.js';
-import { getSettings, save } from './state.js';
 import { debounce, LOG } from './util.js';
 import { isInternalWrite } from './wi.js';
 import { renderBooksView, resetBooksSelection } from './ui-books.js';
@@ -26,7 +25,6 @@ function buildRoot() {
         <div class="lbm-header">
             <div class="lbm-title" data-lbm-i18n="ext_name"></div>
             <input type="search" class="lbm-search text_pole" data-lbm-i18n="[placeholder]search_placeholder">
-            <div class="lbm-max-btn menu_button fa-solid fa-expand" data-lbm-i18n="[title]maximize_title"></div>
         </div>
         <div class="lbm-toolbar"></div>
         <div class="lbm-body"></div>
@@ -81,14 +79,6 @@ const rerenderDebounced = debounce(() => {
     rerenderNow();
 }, 200);
 
-function applyMaximized(dlg) {
-    const s = getSettings();
-    dlg?.classList.toggle('lbm-max', !!s.maximized);
-    const btn = current?.root.querySelector('.lbm-max-btn');
-    btn?.classList.toggle('fa-expand', !s.maximized);
-    btn?.classList.toggle('fa-compress', !!s.maximized);
-}
-
 export async function openManager(initialView = 'books', initialParams = {}) {
     if (current) return;
     resetBooksSelection();
@@ -105,13 +95,6 @@ export async function openManager(initialView = 'books', initialParams = {}) {
         else if (current?.view === 'search') showView('books');
     }, 300);
     searchBox.addEventListener('input', onSearchInput);
-
-    root.querySelector('.lbm-max-btn').addEventListener('click', () => {
-        const s = getSettings();
-        s.maximized = !s.maximized;
-        save();
-        applyMaximized(current?.dlg);
-    });
 
     // Keep the panel live while open
     const events = [event_types?.WORLDINFO_UPDATED, event_types?.WORLDINFO_SETTINGS_UPDATED, event_types?.CHAT_CHANGED].filter(Boolean);
@@ -131,17 +114,14 @@ export async function openManager(initialView = 'books', initialParams = {}) {
         console.error(LOG, 'Popup class failed, falling back to callGenericPopup', err);
         closedPromise = callGenericPopup(root, POPUP_TYPE.TEXT ?? 1, '', popupOptions);
     }
-    // Resolve the dialog element (fallback path attaches it a tick later)
+    // Tag the dialog so our CSS makes it fullscreen (fallback path attaches it
+    // a tick later).
     requestAnimationFrame(() => {
         if (!current) return;
         current.dlg = current.dlg || root.closest('dialog');
         current.dlg?.classList.add('lbm-dialog');
-        applyMaximized(current.dlg);
     });
-    if (current.dlg) {
-        current.dlg.classList.add('lbm-dialog');
-        applyMaximized(current.dlg);
-    }
+    current.dlg?.classList.add('lbm-dialog');
 
     showView(initialView, initialParams);
 

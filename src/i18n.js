@@ -168,7 +168,6 @@ export const I18N = {
         toast_book_duplicated: 'Duplicated as "${name}"',
         toast_error: 'Lorebook Manager: operation failed, see console',
         slash_help: 'Open the Lorebook Manager panel',
-        maximize_title: 'Maximize / restore',
     },
     ru: {
         ext_name: 'Менеджер лорбуков',
@@ -319,7 +318,6 @@ export const I18N = {
         toast_book_duplicated: 'Дубликат: «${name}»',
         toast_error: 'Менеджер лорбуков: операция не удалась, подробности в консоли',
         slash_help: 'Открыть панель Менеджера лорбуков',
-        maximize_title: 'Развернуть / свернуть',
     },
 };
 
