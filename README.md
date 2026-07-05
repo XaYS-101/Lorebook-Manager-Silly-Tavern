@@ -58,15 +58,9 @@ In SillyTavern, go to **Extensions ➜ Install extension** and paste this reposi
 https://github.com/XaYS-101/Lorebook-Manager-Silly-Tavern
 ```
 
-There's no server plugin and no `config.yaml` to edit. The extension runs entirely in the browser.
-
 It needs SillyTavern 1.12.0 or newer (built and tested on 1.17.0).
 
 ---
-
-## How hiding works (for the curious)
-
-ST builds its lorebook selectors from the `world_names` list, where each `<option>` stores the book's index as its value. The extension removes the options for hidden books (hiding them with CSS doesn't work, since select2 ignores it), but it never renumbers or reorders the rest, and it never removes an option that's currently selected, so hiding can't quietly change your active set. Whenever ST rebuilds a selector, a MutationObserver puts the filter back.
 
 ## License
 
