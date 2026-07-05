@@ -35,10 +35,6 @@ const PANEL_HTML = `
                 </div>
             </div>
             <label class="checkbox_label">
-                <input id="lbm_opt_show_hidden" type="checkbox">
-                <span data-lbm-i18n="opt_show_hidden"></span>
-            </label>
-            <label class="checkbox_label">
                 <input id="lbm_opt_confirm_bulk" type="checkbox">
                 <span data-lbm-i18n="opt_confirm_bulk"></span>
             </label>
@@ -82,7 +78,6 @@ function updatePreview(panel, masksOverride) {
 function syncControls(panel) {
     const s = getSettings();
     panel.querySelector('#lbm_language').value = s.language;
-    panel.querySelector('#lbm_opt_show_hidden').checked = !!s.showHidden;
     panel.querySelector('#lbm_opt_confirm_bulk').checked = !!s.confirmBulk;
     panel.querySelector('#lbm_opt_confirm_hide').checked = !!s.confirmHide;
     panel.querySelector('#lbm_patterns').value = getPatterns().join('\n');
@@ -167,10 +162,6 @@ export function mountSettingsPanel() {
         localize(panel);
     });
     panel.querySelector('#lbm_open_manager').addEventListener('click', () => openManager());
-    panel.querySelector('#lbm_opt_show_hidden').addEventListener('change', (e) => {
-        getSettings().showHidden = !!e.target.checked;
-        save();
-    });
     panel.querySelector('#lbm_opt_confirm_bulk').addEventListener('change', (e) => {
         getSettings().confirmBulk = !!e.target.checked;
         save();

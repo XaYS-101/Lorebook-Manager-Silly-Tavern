@@ -672,3 +672,33 @@ dialog.popup.lbm-dialog .popup-content {
         gap: 10px;
     }
 }
+
+/* ---------- Symbol legend ---------- */
+.lbm-legend-grid {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 8px 12px;
+    align-items: center;
+    margin-top: 6px;
+}
+
+.lbm-legend-sym {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    font-size: 1.05em;
+}
+
+.lbm-legend-sym .lbm-dot {
+    cursor: default;
+}
+
+.lbm-legend-sym .lbm-count {
+    opacity: 1;
+    text-align: center;
+}
+
+.lbm-legend-desc {
+    line-height: 1.35;
+}

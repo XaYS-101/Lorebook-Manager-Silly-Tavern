@@ -12,19 +12,6 @@ import { invalidate } from './src/search.js';
 import { mountSettingsPanel } from './src/settings-panel.js';
 import { openManager } from './src/ui-popup.js';
 
-function addWandButton() {
-    const menu = document.getElementById('extensionsMenu');
-    if (!menu || document.getElementById('lbm_wand_button')) return;
-    const item = document.createElement('div');
-    item.id = 'lbm_wand_button';
-    item.className = 'list-group-item flex-container flexGap5 interactable';
-    item.tabIndex = 0;
-    item.innerHTML = '<i class="fa-solid fa-book-atlas"></i><span></span>';
-    item.querySelector('span').textContent = t('wand_button');
-    item.addEventListener('click', () => openManager());
-    menu.appendChild(item);
-}
-
 function addDrawerButton() {
     if (document.getElementById('lbm_drawer_button')) return;
     const anchor = document.getElementById('world_popup_delete');
@@ -66,7 +53,6 @@ function init() {
         }
 
         initHide();
-        addWandButton();
         addDrawerButton();
         addSlashCommand();
 

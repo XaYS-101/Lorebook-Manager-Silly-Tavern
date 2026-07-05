@@ -11,7 +11,6 @@ export const I18N = {
     en: {
         ext_name: 'Lorebook Manager',
         open_manager: 'Open manager',
-        wand_button: 'Lorebook Manager',
         drawer_button_title: 'Open Lorebook Manager',
         close: 'Close',
         back: 'Back',
@@ -36,6 +35,13 @@ export const I18N = {
         entries_short: 'entries',
         collapse_all: 'Collapse all',
         expand_all: 'Expand all',
+
+        // Legend (symbols help)
+        legend_title: 'Symbol legend',
+        legend_dot: 'Green dot — the book is active globally. Click it to toggle.',
+        legend_count: 'Numbers like 3/5 — enabled entries out of the total.',
+        legend_primary: 'Primary lorebook of a character',
+        legend_aux: 'Additional lorebook of a character',
 
         // Book actions
         act_open_editor: 'Open in ST editor',
@@ -145,7 +151,6 @@ export const I18N = {
         // Settings panel
         language: 'Language',
         lang_auto: 'Auto',
-        opt_show_hidden: 'Show the "Hidden" section in the manager',
         opt_confirm_bulk: 'Confirm bulk operations',
         auto_hide_title: 'Auto-hide by name',
         auto_hide_help: 'One mask per line. Use * and ? as wildcards (chat_* hides names starting with chat_); a plain word matches any name containing it (case-insensitive). Manually showing a book overrides its mask.',
@@ -172,7 +177,6 @@ export const I18N = {
     ru: {
         ext_name: 'Менеджер лорбуков',
         open_manager: 'Открыть менеджер',
-        wand_button: 'Менеджер лорбуков',
         drawer_button_title: 'Открыть менеджер лорбуков',
         close: 'Закрыть',
         back: 'Назад',
@@ -196,6 +200,12 @@ export const I18N = {
         entries_short: 'записей',
         collapse_all: 'Свернуть все',
         expand_all: 'Развернуть все',
+
+        legend_title: 'Условные обозначения',
+        legend_dot: 'Зелёная точка — книга активна глобально. Нажмите, чтобы переключить.',
+        legend_count: 'Числа вида 3/5 — включённых записей из общего числа.',
+        legend_primary: 'Основной лорбук персонажа',
+        legend_aux: 'Дополнительный лорбук персонажа',
 
         act_open_editor: 'Открыть в редакторе ST',
         act_open_manager: 'Открыть записи',
@@ -296,7 +306,6 @@ export const I18N = {
 
         language: 'Язык',
         lang_auto: 'Авто',
-        opt_show_hidden: 'Показывать секцию «Скрытые» в менеджере',
         opt_confirm_bulk: 'Подтверждать массовые операции',
         auto_hide_title: 'Авто-скрытие по имени',
         auto_hide_help: 'По одной маске на строку. Знаки * и ? — подстановочные (chat_* спрячет имена, начинающиеся с chat_); обычное слово совпадает с любым именем, где оно встречается (без учёта регистра). Ручное «Показать» имеет приоритет над маской.',

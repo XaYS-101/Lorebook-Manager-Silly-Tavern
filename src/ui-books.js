@@ -74,6 +74,32 @@ export function resetBooksSelection() {
     selBooks.clear();
 }
 
+// Explains every symbol a book row can show: the activity dot, the entry
+// counter and each binding/state badge. Symbol cells are trusted constants;
+// only the descriptions are user-facing translations, so escape those.
+function showLegend() {
+    const rows = [
+        ['<span class="lbm-dot lbm-on"></span>', t('legend_dot')],
+        ['<span class="lbm-count">3/5</span>', t('legend_count')],
+        ['🌐', t('badge_global')],
+        ['💬', t('badge_chat')],
+        ['👤', t('legend_primary')],
+        ['👥', t('legend_aux')],
+        ['🎭', t('badge_persona')],
+        ['⚠', t('active_hidden_badge')],
+        ['✳', t('hidden_by_rule')],
+    ];
+    const wrap = document.createElement('div');
+    wrap.className = 'lbm-dialog-content lbm-legend';
+    wrap.innerHTML = `
+        <h4>${escapeHtml(t('legend_title'))}</h4>
+        <div class="lbm-legend-grid">
+            ${rows.map(([sym, desc]) => `<div class="lbm-legend-sym">${sym}</div><div class="lbm-legend-desc">${escapeHtml(desc)}</div>`).join('')}
+        </div>
+    `;
+    callGenericPopup(wrap, POPUP_TYPE.TEXT ?? 1, '', { okButton: t('close') });
+}
+
 export async function renderBooksView(toolbar, body, nav) {
     const s = getSettings();
     const allNames = wi.listBooks();
@@ -95,6 +121,7 @@ export async function renderBooksView(toolbar, body, nav) {
         </label>
         <div class="menu_button lbm-tb-btn lbm-collapse-all fa-solid fa-compress" data-lbm-i18n="[title]collapse_all"></div>
         <div class="menu_button lbm-tb-btn lbm-sel-toggle ${selMode ? 'lbm-active' : ''}"><i class="fa-solid fa-list-check"></i><span>${escapeHtml(selMode ? t('sel_exit') : t('sel_mode'))}</span></div>
+        <div class="menu_button lbm-tb-btn lbm-legend-btn fa-solid fa-circle-question" data-lbm-i18n="[title]legend_title"></div>
         <div class="lbm-tb-count" data-count></div>
     `;
     localize(toolbar);
@@ -119,6 +146,7 @@ export async function renderBooksView(toolbar, body, nav) {
         save();
         nav.rerender();
     });
+    toolbar.querySelector('.lbm-legend-btn').addEventListener('click', () => showLegend());
     toolbar.querySelector('.lbm-collapse-all').addEventListener('click', () => {
         const anyOpen = Object.values(s.folders).some(f => !f.collapsed);
         for (const f of Object.values(s.folders)) f.collapsed = anyOpen;

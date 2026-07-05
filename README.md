@@ -4,73 +4,69 @@
 
 # Lorebook Manager
 
-A SillyTavern extension that gives World Info the management panel it never had: all your lorebooks in one place, with folders, hiding, cross-book search, bulk entry operations and a live overview of where each book is bound.
+A SillyTavern extension for managing World Info. It puts all your lorebooks in one panel with folders, hiding, search across every book at once, bulk entry edits, and an overview of where each book is used.
 
-**Important:** Your lorebook files are never touched by folders or hiding — all of that lives in the extension's settings. Delete the extension and everything returns exactly as it was. Only the explicit Delete/Rename/Duplicate/bulk-entry actions modify books, and every destructive action asks for confirmation first. (Still, make backups.)
+**Your files stay safe.** Folders and hiding live in the extension's own settings and never touch the lorebook files. Remove the extension and everything goes back to how it was. Only Delete, Rename, Duplicate, and the bulk entry actions change a book, and each of those asks first. Keep backups anyway.
 
-**Note:** This extension is actively developed and not perfect. Bugs can and will happen. If something breaks, check the browser console for `[LBM]` errors and report an issue with details.
+**Heads up:** this is still under active development, so bugs happen. If something breaks, open the browser console, look for `[LBM]` errors, and file an issue with the details.
 
 ---
 
-## Features
+## What it does
 
-### 1. The manager panel
-One popup with every lorebook you have. Open it from:
-- the wand menu (Extensions ➜ **Lorebook Manager**),
-- the 📚 button inside the World Info drawer,
+### The manager panel
+One popup with every lorebook you have. You can open it from:
+- the 📚 button in the World Info drawer,
 - the `/lorebooks` slash command,
 - the button in the extension's settings.
 
-The panel is a modal dialog with a **maximize button** (⤢) that expands it to full screen and back; the state is remembered. On phones it is always fullscreen, with icon toolbars and big tap targets.
+It opens as a fullscreen dialog. On phones it's the same, with icon-only toolbars and large tap targets.
 
-Each book row shows: a green **activation dot** (tap to toggle the book globally), the name, an **entry counter** (enabled/total), and **binding badges** — 🌐 global, 💬 chat, 👤 character primary, 👥 character auxiliary, 🎭 persona.
+Each book row shows a green activation dot (tap it to turn the book on or off globally), the name, an entry counter (enabled out of total), and small badges for where the book is bound: 🌐 global, 💬 chat, 👤 character primary, 👥 character auxiliary, 🎭 persona. A book that's active but hidden gets a ⚠, and one hidden by an auto-hide mask gets a ✳. If you forget what a symbol means, the **?** button in the toolbar opens a legend.
 
-### 2. Hide, don't delete
-The `⋮` menu on any book has **Hide**. A hidden book:
-- disappears from ST's own selectors — the global "Active World(s)" list, the editor's "Pick to Edit" dropdown, the character card's lorebook pickers and the chat-lorebook picker;
-- stays completely intact on disk and keeps working if it was active or bound (the manager shows a ⚠ badge for "active but hidden");
-- lives in a dimmed **Hidden** section of the manager (toggle "Show hidden"), from which one tap brings it back.
+### Hide instead of delete
+Every book has a **Hide** option in its `⋮` menu. A hidden book drops out of ST's own selectors: the global "Active World(s)" list, the "Pick to Edit" dropdown in the editor, the lorebook pickers on character cards, and the chat-lorebook picker. The file itself stays put and keeps working if it was active or bound (the manager flags that case with a ⚠). Hidden books collect in a dimmed **Hidden** section that you show or hide with the "Show hidden" toggle, and one tap brings any of them back.
 
-If the book is currently used somewhere, the hide dialog lists its bindings and offers to also deactivate it globally.
+If the book is in use somewhere, the hide dialog lists its bindings and offers to switch off its global activation at the same time.
 
-**Auto-hide by name.** In the extension settings you can enter one or more **masks** (one per line) to hide matching books automatically — including books you create later. `*` and `?` are wildcards (`chat_*` hides everything starting with `chat_`); a plain word matches any name that contains it, case-insensitively (`diary` hides "Alice's diary"). A live counter shows how many books currently match. This is ideal for the "one lorebook per chat" workflow: mask the chat books once and only your shared/global books stay in view. Manually clicking **Show** on a masked book keeps it visible as an exception — manual choice always wins over a mask.
+**Auto-hide by name.** In the settings you can add masks, one per line, to hide matching books on sight, including ones you make later. `*` and `?` work as wildcards, so `chat_*` hides anything starting with `chat_`. A plain word matches any name that contains it, ignoring case, so `diary` hides "Alice's diary". A live counter tells you how many books currently match. This works well for the "one lorebook per chat" setup: mask the chat books once and only your shared books stay visible. If you click **Show** on a masked book, it stays visible as an exception, because a manual choice always beats a mask.
 
-### 3. Folders
-Collapsible folders with a colour stripe and an emoji icon, nestable via the parent picker (with cycle protection). File books by drag-and-drop on desktop or through the "Move to folder…" picker anywhere. Folder counters show the real number of books including subfolders. Sorting: alphabetical or manual (with per-row up/down arrows).
+### Folders
+Folders collapse, take a colour stripe and an emoji icon, and nest inside each other through the parent picker (with a check that stops loops). Sort books into them by dragging on desktop, or use the "Move to folder…" picker anywhere. Folder counts include books in subfolders. You can sort alphabetically or by hand, with up and down arrows on each row.
 
-### 4. Search across ALL books
-ST's built-in search only looks inside the currently opened book. The manager's search box scans **every** book — keys, secondary keys, titles and content, multi-word queries use AND logic. The first search indexes your books once (with a progress indicator and cancel); after that it's instant. Results are grouped by book with highlighted snippets; one click opens the entry in ST's native editor, pre-filtered and flashed.
+### Search across every book
+ST's own search only looks inside the book you have open. The search box here reads every book at once: keys, secondary keys, titles, and content. Multi-word queries use AND. The first search indexes your books once, with a progress bar and a cancel button, and after that it's instant. Results group by book with the matching text highlighted, and a click opens the entry in ST's own editor, already filtered and flashed.
 
-### 5. Bulk entry operations
-Open any book inside the manager: every entry with its status dot (🟢 enabled / 🔵 constant / ⚪ disabled), title and keys. Toggle single entries with a tap, or hit **Select** and check many at once — then enable, disable or delete them in one action. **Enable all / Disable all** buttons handle the whole book. Everything operates on the book data directly (not the paginated editor DOM) and reloads ST's editor if it has that book open.
+### Bulk entry edits
+Open a book inside the manager and you get every entry with a status dot (🟢 enabled, 🔵 constant, ⚪ disabled), its title, and its keys. Tap a dot to flip one entry, or hit **Select** to tick several and enable, disable, or delete them together. **Enable all** and **Disable all** cover the whole book at once. It all works on the book data directly rather than the paginated editor, and it reloads ST's editor if that book is open there.
 
-### 6. Bindings
-The `⋮` ➜ **Bindings** dialog shows and edits where a book is used: toggle global activation, bind/unbind it to the current chat, make it the primary or an auxiliary lorebook of the current character. Renaming a book through the manager keeps all these bindings pointing at the new name (something ST itself only partially does).
+### Bindings
+The `⋮` ➜ **Bindings** dialog shows where a book is used and lets you change it: toggle global activation, bind or unbind it to the current chat, or set it as the primary or an auxiliary lorebook for the current character. If you rename a book through the manager, these bindings follow the new name, which ST on its own only does part of the time.
 
-### 7. Housekeeping
-- **EN/RU interface** (Russian by default, auto mode follows ST's language).
-- **Export / Import** of the extension's data (folders, assignments, hidden list) as JSON.
-- **Clear all data** button that resets the extension and returns hidden books to ST's selectors — lorebooks themselves are untouched.
+### Odds and ends
+- English and Russian interface (Russian by default; Auto follows ST's language).
+- Export and import of the extension's data (folders, assignments, hidden list) as JSON.
+- A **Clear all data** button that resets the extension and returns hidden books to ST's selectors. Your lorebooks are left alone.
 
 ---
 
 ## Installation
 
-In SillyTavern: **Extensions ➜ Install extension** and paste this repository URL:
+In SillyTavern, go to **Extensions ➜ Install extension** and paste this repository URL:
 
 ```
 https://github.com/XaYS-101/Lorebook-Manager-Silly-Tavern
 ```
 
-No server plugin, no `config.yaml` edits — the extension is fully client-side.
+There's no server plugin and no `config.yaml` to edit. The extension runs entirely in the browser.
 
-Requires SillyTavern 1.12.0 or newer (developed and tested on 1.17.0).
+It needs SillyTavern 1.12.0 or newer (built and tested on 1.17.0).
 
 ---
 
-## How hiding works (technical note)
+## How hiding works (for the curious)
 
-ST derives its lorebook selectors from the `world_names` list, where each `<option>` carries the book's index as its value. The extension removes the options of hidden books (select2 ignores CSS hiding) without ever renumbering or reordering the rest, and never removes an option that is currently selected — so hiding can't silently change your active set. When ST rebuilds the selectors, MutationObservers re-apply the filter.
+ST builds its lorebook selectors from the `world_names` list, where each `<option>` stores the book's index as its value. The extension removes the options for hidden books (hiding them with CSS doesn't work, since select2 ignores it), but it never renumbers or reorders the rest, and it never removes an option that's currently selected, so hiding can't quietly change your active set. Whenever ST rebuilds a selector, a MutationObserver puts the filter back.
 
 ## License
 
